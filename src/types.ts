@@ -25,3 +25,12 @@ export interface AAAcount {
     balance?: number;
     tokens?: string[]
 } 
+export interface Account{
+    privateKey?: string;
+    AAaddress?: string;
+}
+export interface CLIOpts {
+    dryRun: boolean;
+    withPM: boolean;
+  }
+  
