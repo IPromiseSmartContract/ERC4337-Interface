@@ -5,6 +5,7 @@ import { useWalletStore } from "../stores/wallet.ts";
 import { computed } from "@vue/reactivity";
 const showAccountModal = ref(false);
 const walletStore = useWalletStore();
+const loading = ref(false);
 const generateWallet = async () => {
   await walletStore.generateAA({
     withPM: false,
@@ -23,11 +24,13 @@ const walletStorePrivateKey = computed({
   },
 });
 const createAAByPkey = async () => {
+  loading.value = true;
   await walletStore.setAA(walletStorePrivateKey.value!, {
     withPM: false,
     dryRun: false,
   });
   showAccountModal.value = false;
+  loading.value = false;
 };
 const showPrivateKey = ref(false);
 const togglePrivateKeyVisibility = () => {
@@ -61,6 +64,7 @@ const togglePrivateKeyVisibility = () => {
   <!-- Main modal -->
   <UserOpModal
     :open="showAccountModal"
+    :loading="loading"
     @toggle-modal="() => (showAccountModal = false)"
     @confirm-modal="createAAByPkey()"
   >

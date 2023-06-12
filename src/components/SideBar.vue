@@ -9,6 +9,14 @@ function togglePage(page: Page) {
   emit("toggle-page", page);
 }
 const walletStore = useWalletStore();
+const copyAddress = async () => {
+  try {
+    await navigator.clipboard.writeText(walletStore.AAaddress!);
+    console.log("Address copied to clipboard");
+  } catch (err) {
+    console.error("Failed to copy address: ", err);
+  }
+};
 </script>
 <template>
   <!-- Sidebar -->
@@ -27,6 +35,7 @@ const walletStore = useWalletStore();
             </div>
             <div
               class="bg-slate-400 opacity-30 hover:opacity-60 p-1 text-black cursor-pointer text-center rounded text-sm"
+              @click="copyAddress"
             >
               Copy
             </div>
