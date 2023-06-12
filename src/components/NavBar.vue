@@ -5,8 +5,8 @@ import WalletBtn from "./WalletModal.vue";
   <!-- Navbar -->
   <nav class="fixed top-0 z-50 w-full bg-zinc-900 border-b border-gray-200">
     <div class="px-3 py-3 lg:px-5 lg:pl-3">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center justify-start">
+      <div class="grid grid-cols-3 items-center justify-between">
+        <div class="col-span-1 items-center justify-start">
           <button
             data-drawer-target="logo-sidebar"
             data-drawer-toggle="logo-sidebar"
@@ -29,21 +29,17 @@ import WalletBtn from "./WalletModal.vue";
               ></path>
             </svg>
           </button>
-          <a href="https://flowbite.com" class="flex ml-2 md:mr-24">
-            <img
-              src="https://flowbite.com/docs/images/logo.svg"
-              class="h-8 mr-3"
-              alt="FlowBite Logo"
-            />
+        </div>
+
+        <div class="flex col-span-1 items-center justify-center">
+          <a href="#" class="">
             <span
-              class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap text-white"
+              class="self-center text-md font-semibold sm:text-xl whitespace-nowrap text-white erc4337"
               >ERC.4337</span
             >
           </a>
         </div>
-
-        <div class="flex items-center justify-start"></div>
-        <div class="flex items-center">
+        <div class="flex col-span-1 justify-end items-center">
           <div class="flex items-center ml-3">
             <WalletBtn></WalletBtn>
           </div>
@@ -53,4 +49,25 @@ import WalletBtn from "./WalletModal.vue";
   </nav>
 </template>
 
-<style scoped></style>
+<style scoped>
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.erc4337 {
+  background: linear-gradient(270deg, #b273fa, #65ffa5);
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+</style>

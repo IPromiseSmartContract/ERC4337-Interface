@@ -6,7 +6,9 @@ import UserOpModal from "../components/UserOpModal.vue";
 import PmList from "../components/PmList.vue";
 import { Page, UserOpInfo } from "../types";
 import Account from "../components/AAAccount.vue";
+import { useWalletStore } from "../stores/wallet";
 import Intro from "../components/Intro.vue";
+import { userInfo } from "os";
 enum USER_OP {
   NONE,
   SEND_ASSET,
@@ -20,7 +22,7 @@ enum MODAL_TYPE {
 }
 // Asset
 const assetOptions = [
-  { value: "ETH is not ERC20 token (no address)", text: "ETH" },
+  { value: "MATIC is not ERC20 token (no address)", text: "MATIC" },
   { value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", text: "USDC" },
   { value: "0xdac17f958d2ee523a2206206994597c13d831ec7", text: "USDT" },
   { value: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", text: "wBTC" },
@@ -35,18 +37,19 @@ const payMasterOptions = [
 const userOpInfo: UserOpInfo = reactive({
   fromAddr: undefined,
   toAddr: undefined,
-  assetType: "ETH is not ERC20 token (no address)",
+  assetType: "MATIC is not ERC20 token (no address)",
   amount: undefined,
   paymaster: undefined,
-  callGasLimit: 20000,
-  preVerificationGasLimit: 30000,
-  VerificationGasLimit: 25000,
-  maxFeePerGas: 10000,
-  maxPriorityFeePerGas: 200000,
+  callGasLimit: undefined,
+  preVerificationGasLimit: undefined,
+  VerificationGasLimit: undefined,
+  maxFeePerGas: undefined,
+  maxPriorityFeePerGas: undefined,
 });
 // Modal
 const showModal = ref(MODAL_TYPE.NONE);
 const showOps = ref(USER_OP.SEND_ASSET);
+const loading = ref(false);
 const disableAdvanceOpt = ref(true);
 function toggleModal(modal: MODAL_TYPE) {
   showModal.value = showModal.value === modal ? MODAL_TYPE.NONE : modal;
@@ -67,37 +70,100 @@ function changeOp(opType: USER_OP) {
       break;
   }
 }
-function confirmTxInfo() {
+const confirmTxInfo = async () => {
+  loading.value = true;
+  await buildUserOp();
+  loading.value = false;
   toggleModal(MODAL_TYPE.TX_INFO);
   showModal.value = MODAL_TYPE.GAS_SETTING;
-}
+};
 // Page Control
 const currentPage = ref<Page>("Home");
 function togglePage(page: Page) {
   currentPage.value = page;
 }
+// 使用你的 wallet store
+const walletStore = useWalletStore();
+const buildUserOp = async () => {
+  if (!walletStore.privateKey) {
+    alert("Please generate or set wallet first");
+    return;
+  }
+  if (!userOpInfo.toAddr) {
+    alert("Please input receiver address");
+    return;
+  }
+  if (!userOpInfo.amount) {
+    alert("Please input amount");
+    return;
+  }
+  const op = await walletStore.buildTransfer(
+    userOpInfo.toAddr,
+    userOpInfo.amount,
+    {
+      withPM: false,
+      dryRun: true,
+    }
+  );
+  userOpInfo.callGasLimit = op.callGasLimit;
+  userOpInfo.verificationGasLimit = op.verificationGasLimit;
+  userOpInfo.preVerificationGas = op.preVerificationGas;
+  userOpInfo.maxFeePerGas = op.maxFeePerGas;
+  userOpInfo.maxPriorityFeePerGas = op.maxPriorityFeePerGas;
+  alert(userOpInfo);
+};
+const transfer = async () => {
+  if (!walletStore.privateKey) {
+    alert("Please generate or set wallet first");
+    return;
+  }
+  if (!userOpInfo.toAddr) {
+    alert("Please input receiver address");
+    return;
+  }
+  if (!userOpInfo.amount) {
+    alert("Please input amount");
+    return;
+  }
+  await walletStore.transfer(userOpInfo.toAddr, userOpInfo.amount, {
+    withPM: false,
+    dryRun: false,
+  });
+};
+const sendUserOp = async () => {
+  loading.value = true;
+  await transfer();
+  loading.value = false;
+  toggleModal(MODAL_TYPE.GAS_SETTING);
+};
 </script>
 <template>
   <!-- Sidebar -->
-  <SideBar
-    @toggle-modal="toggleModal(MODAL_TYPE.OPTION)"
-    @toggle-page="togglePage"
-  ></SideBar>
+  <SideBar @toggle-page="togglePage"></SideBar>
   <div class="p-4 sm:ml-64">
     <div class="p-4 rounded-lg mt-14">
-      <Intro v-if="currentPage === 'Home'"></Intro>
+      <Intro
+        @toggle-modal="toggleModal(MODAL_TYPE.OPTION)"
+        v-if="currentPage === 'Home'"
+      ></Intro>
       <Account v-if="currentPage === 'Account'"></Account>
       <PmList v-if="currentPage === 'Paymaster'"></PmList>
     </div>
 
     <UserOpModal
+      :loading="loading"
       :open="showModal === MODAL_TYPE.OPTION"
       @toggle-modal="toggleModal(MODAL_TYPE.OPTION)"
       @confirm-modal="changeOp(showOps)"
     >
-      <div class="flex flex-col gap-2">
-        <p class="text-xl font-bold">Let's do something.</p>
-        <p class="text-xl text-gray-400 dark:text-gray-500"></p>
+      <div class="flex flex-col gap-8">
+        <div class="flex justify-between items-center">
+          <p class="text-xl font-bold">Let's do something.</p>
+          <span
+            class="inline-flex items-center rounded-md bg-purple-200 px-2 py-1 text-xs font-medium text-purple-700"
+            >Polygon</span
+          >
+        </div>
         <div class="flex flex-row w-full justify-center gap-4">
           <button
             @click="showOps = USER_OP.SEND_ASSET"
@@ -118,6 +184,7 @@ function togglePage(page: Page) {
       </div>
     </UserOpModal>
     <UserOpModal
+      :loading="loading"
       :open="showModal === MODAL_TYPE.TX_INFO"
       @toggle-modal="toggleModal(MODAL_TYPE.TX_INFO)"
       @confirm-modal="confirmTxInfo"
@@ -197,9 +264,10 @@ function togglePage(page: Page) {
       </div>
     </UserOpModal>
     <UserOpModal
+      :loading="loading"
       :open="showModal === MODAL_TYPE.GAS_SETTING"
       @toggle-modal="toggleModal(MODAL_TYPE.GAS_SETTING)"
-      @confirm-modal="toggleModal(MODAL_TYPE.GAS_SETTING)"
+      @confirm-modal="sendUserOp"
     >
       <div>
         <p class="text-xl font-bold">Choose who to pay gas</p>
@@ -256,7 +324,7 @@ function togglePage(page: Page) {
         </div>
         <div class="relative z-0 w-full mb-6 group">
           <input
-            v-model="userOpInfo.preVerificationGasLimit"
+            v-model="userOpInfo.preVerificationGas"
             :class="[disableAdvanceOpt ? 'border-b-0' : 'border-b-2']"
             type="email"
             name="floating_email"
@@ -274,7 +342,7 @@ function togglePage(page: Page) {
         </div>
         <div class="relative z-0 w-full mb-6 group">
           <input
-            v-model="userOpInfo.VerificationGasLimit"
+            v-model="userOpInfo.verificationGasLimit"
             :class="[disableAdvanceOpt ? 'border-b-0' : 'border-b-2']"
             type="email"
             name="floating_email"

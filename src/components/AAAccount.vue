@@ -191,10 +191,4 @@ var selectedAcount = ref<AAAcount>();
 const showOperationModal = (account: AAAcount) => {
   selectedAcount.value = account;
 };
-// const paymasterAccount = computed(() => {
-//   account.aaAcounts.filter((aaAccout) => aaAccout.role === "Paymaster");
-// });
-// const userAccount = computed(() => {
-//   account.aaAcounts.filter((aaAccout) => aaAccout.role === "User");
-// });
 </script>

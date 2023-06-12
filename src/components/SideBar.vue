@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { useWalletStore } from "../stores/wallet.ts";
 import { Page } from "../types";
 const emit = defineEmits(["toggle-modal", "toggle-page"]);
-
 function toggleModal() {
   emit("toggle-modal");
 }
 function togglePage(page: Page) {
   emit("toggle-page", page);
 }
+const walletStore = useWalletStore();
 </script>
 <template>
   <!-- Sidebar -->
@@ -18,39 +19,17 @@ function togglePage(page: Page) {
   >
     <div class="h-full px-3 pb-4 overflow-y-auto">
       <ul class="space-y-2 font-extrabold">
-        <li class="text-center text-md text-green-300">Acount Abstraction</li>
         <li>
-          <a
-            @click="toggleModal"
-            href="#"
-            class="mb-4 flex items-center bg-green-300 rounded-lg text-black hover:bg-gray-100 p-3"
-          >
-            <svg
-              aria-hidden="true"
-              class="w-6 h-6 text-black transition duration-75 group-hover:text-gray-900 dark:group-hover:text-white"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
+          <p class="text-center">Address</p>
+          <div class="flex justify-between items-center py-3">
+            <div class="grow truncate text-center">
+              {{ walletStore.AAaddress || "no account yet" }}
+            </div>
+            <div
+              class="bg-slate-400 opacity-30 hover:opacity-60 p-1 text-black cursor-pointer text-center rounded text-sm"
             >
-              <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-              <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-            </svg>
-            <span class="ml-3">New User Operation</span>
-          </a>
-        </li>
-        <li>
-          <div class="relative z-0 w-full mb-6 group">
-            <label
-              for="countries"
-              class="block mb-2 text-xs text-center font-medium text-white dark:text-white"
-              >Address</label
-            >
-            <select
-              id="countries"
-              class="bg-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            >
-              <option>0xf6fbbFC3C1eCe8Ef1D6Ee5F5F28702037875d470</option>
-            </select>
+              Copy
+            </div>
           </div>
         </li>
 

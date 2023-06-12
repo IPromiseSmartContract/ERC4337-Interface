@@ -99,7 +99,7 @@
 import { reactive } from "vue";
 const paymaster = reactive([
   {
-    name: "WomanPay",
+    name: "IPromise Pay",
     address: "0x92c25894B20b9055FA407006B6e43Fc8F666a354",
     creater: "0x92c25894B20b9055FA407006B6e43Fc8F666a354",
     stakedEther: 5.3,
@@ -108,7 +108,16 @@ const paymaster = reactive([
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
   },
   {
-    name: "BlackPay",
+    name: "Alice Pay",
+    address: "0x92c25894B20b9055FA407006B6e43Fc8F666a354",
+    creater: "0x92c25894B20b9055FA407006B6e43Fc8F666a354",
+    stakedEther: 7.29,
+    finishedTxCount: 15,
+    imageUrl:
+      "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  },
+  {
+    name: "Bob Pay",
     address: "0x92c25894B20b9055FA407006B6e43Fc8F666a354",
     creater: "0x92c25894B20b9055FA407006B6e43Fc8F666a354",
     stakedEther: 7.29,

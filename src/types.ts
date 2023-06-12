@@ -1,17 +1,19 @@
+import { BigNumberish } from "ethers";
+
 export type Page = "Home" | "Paymaster" | "Account"
 // UserOp
 export interface UserOpInfo {
     fromAddr?: string;
     toAddr?: string;
     assetType?: string;
-    amount?: number;
+    amount?: string;
     paymaster?: string;
     // Gas things ...
-    callGasLimit?: number;
-    preVerificationGasLimit?: number;
-    VerificationGasLimit?: number;
-    maxFeePerGas?: number;
-    maxPriorityFeePerGas?: number;
+    callGasLimit?: BigNumberish;
+    preVerificationGas?: BigNumberish;
+    verificationGasLimit?: BigNumberish;
+    maxFeePerGas?: BigNumberish;
+    maxPriorityFeePerGas?: BigNumberish;
 }
 export interface EOAAccount {
     address: string;
