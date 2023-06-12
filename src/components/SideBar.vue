@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useWalletStore } from "../stores/wallet.ts";
 import { Page } from "../types";
+import {truncateAddr} from "../utils/wallet"
 const emit = defineEmits(["toggle-modal", "toggle-page"]);
 function toggleModal() {
   emit("toggle-modal");
@@ -31,7 +32,7 @@ const copyAddress = async () => {
           <p class="text-center">Address</p>
           <div class="flex justify-between items-center py-3">
             <div class="grow truncate text-center">
-              {{ walletStore.AAaddress || "no account yet" }}
+              {{ truncateAddr(walletStore.AAaddress, 4) || "no account yet" }}
             </div>
             <div
               class="bg-slate-400 opacity-30 hover:opacity-60 p-1 text-black cursor-pointer text-center rounded text-sm"
