@@ -1,12 +1,15 @@
 <!-- Pay master list -->
 <template>
-  <div class="container px-60 py-4">
-    <ul role="list" class="divide-y divide-zinc-500">
+  <div class="py-2 px-10">
+    <div class="text-xl mt-10 mb-4 min-w-0 truncate">Pay Master</div>
+    <ul role="list">
       <li v-for="person in paymaster" :key="person.address">
         <div
-          class="flex md:flex-row flex-col justify-between items-center gap-6 bg-zinc-800 p-6 py-5 my-2 rounded-lg"
+          class="flex grow lg:flex-row flex-col justify-between items-center gap-6 bg-zinc-800 p-6 py-5 my-2 rounded-lg"
         >
-          <div class="flex gap-x-4 items-center">
+          <div
+            class="flex grow lg:flex-row flex-col gap-x-4 justify-center items-center"
+          >
             <img
               class="h-14 flex-none object-cover rounded-full"
               :src="person.imageUrl"
@@ -39,7 +42,7 @@
               </p>
             </div>
           </div>
-          <div class="flex md:flex-row flex-col gap-6">
+          <div class="flex lg:flex-row flex-col gap-6">
             <div class="flex flex-col items-center justify-center gap-4">
               <div class="">
                 <!-- <label
@@ -74,7 +77,7 @@
                   </div>
                 </div>
               </div>
-              <div class="flex w-full justify-between">
+              <div class="flex justify-between gap-2">
                 <button
                   type="button"
                   class="focus:outline-none text-black bg-purple-300 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-extrabold rounded-lg text-sm px-3 py-1"

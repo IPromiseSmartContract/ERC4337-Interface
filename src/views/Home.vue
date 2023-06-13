@@ -8,7 +8,7 @@ import { Page, UserOpInfo } from "../types";
 import Account from "../components/AAAccount.vue";
 import { useWalletStore } from "../stores/wallet";
 import Intro from "../components/Intro.vue";
-import { userInfo } from "os";
+import { ethers } from "ethers";
 enum USER_OP {
   NONE,
   SEND_ASSET,
@@ -29,9 +29,9 @@ const assetOptions = [
 ];
 // Paymaster
 const payMasterOptions = [
-  { value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", text: "MaxPay" },
-  { value: "0xdac17f958d2ee523a2206206994597c13d831ec7", text: "AlanPay" },
-  { value: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", text: "支付宝" },
+  { value: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", text: "Promise Pay" },
+  { value: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", text: "Alice Pay" },
+  { value: "0xdac17f958d2ee523a2206206994597c13d831ec7", text: "Bob Pay" },
 ];
 
 const userOpInfo: UserOpInfo = reactive({
@@ -105,13 +105,19 @@ const buildUserOp = async () => {
       dryRun: true,
     }
   );
-  userOpInfo.callGasLimit = op.callGasLimit;
-  userOpInfo.verificationGasLimit = op.verificationGasLimit;
-  userOpInfo.preVerificationGas = op.preVerificationGas;
-  userOpInfo.maxFeePerGas = op.maxFeePerGas;
-  userOpInfo.maxPriorityFeePerGas = op.maxPriorityFeePerGas;
-  alert(userOpInfo);
+  userOpInfo.callGasLimit = ethers.BigNumber.from(op.callGasLimit);
+  userOpInfo.verificationGasLimit = ethers.BigNumber.from(
+    op.verificationGasLimit
+  );
+  userOpInfo.preVerificationGas = ethers.BigNumber.from(op.preVerificationGas);
+  userOpInfo.maxFeePerGas = ethers.BigNumber.from(op.maxFeePerGas);
+  userOpInfo.maxPriorityFeePerGas = ethers.BigNumber.from(
+    op.maxPriorityFeePerGas
+  );
+  alert("Build user op success!");
 };
+const showStatus = ref(false);
+const txhash = ref("");
 const transfer = async () => {
   if (!walletStore.privateKey) {
     alert("Please generate or set wallet first");
@@ -125,19 +131,70 @@ const transfer = async () => {
     alert("Please input amount");
     return;
   }
-  await walletStore.transfer(userOpInfo.toAddr, userOpInfo.amount, {
-    withPM: false,
-    dryRun: false,
-  });
+  const txhash_ = await walletStore.transfer(
+    userOpInfo.toAddr,
+    userOpInfo.amount,
+    {
+      withPM: false,
+      dryRun: false,
+    }
+  );
+  if (txhash_) {
+    txhash.value = txhash_;
+  } else {
+    alert("Transfer failed");
+  }
 };
 const sendUserOp = async () => {
   loading.value = true;
   await transfer();
   loading.value = false;
   toggleModal(MODAL_TYPE.GAS_SETTING);
+  showStatus.value = true;
 };
 </script>
 <template>
+  <div
+    v-if="showStatus"
+    class="fixed z-40 inset-0 overflow-y-auto shadow-xl transition-all"
+    aria-labelledby="modal-title"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
+    <div class="flex items-center justify-center min-h-screen">
+      <div
+        class="bg-white rounded-lg px-4 pt-5 pb-4 overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full"
+      >
+        <div>
+          <h3
+            class="text-lg leading-6 font-medium text-gray-900"
+            id="modal-title"
+          >
+            Success!
+          </h3>
+          <div class="mt-2">
+            <p class="text-sm text-gray-500">Your operation was successful.</p>
+          </div>
+        </div>
+        <div class="flex flex-auto gap-4 mt-10">
+          <button
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-green-300 text-base font-medium text-black hover:text-white hover:bg-green-700"
+          >
+            <a :href="`https://mumbai.polygonscan.com/tx/${txhash}`">
+              Transaction detail
+            </a>
+          </button>
+          <button
+            @click="showStatus = false"
+            class="inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-gray-300 text-base font-medium text-black hover:bg-gray-700 hover:text-white"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Sidebar -->
   <SideBar @toggle-page="togglePage"></SideBar>
   <div class="p-4 sm:ml-64">
